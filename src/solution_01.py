@@ -11,17 +11,41 @@ import collections
 import math
 
 def problem1(input: str) -> int | str:
-    output: int = 0
     lines = utils.read_lines(input)
-    # Add your solution logic here
     
-    return output
+    l1 = []
+    l2 = []
+    for i in lines:
+        i = i.split(" ")
+        l1.append(int(i[0]))
+        l2.append(int(i[-1]))
+    
+    l1 = sorted(l1)
+    l2 = sorted(l2)
+
+    d = 0
+    for i,j in zip(l1, l2):
+        d += abs(i - j)
+        
+    return d
+
 
 def problem2(input: str) -> int | str:
     output: int = 0
     lines = utils.read_lines(input)
-    # Add your solution logic here
     
+    l1 = []
+    l2 = []
+    for i in lines:
+        i = i.split(" ")
+        l1.append(int(i[0]))
+        l2.append(int(i[-1]))
+    
+    l2 = collections.Counter(l2)
+
+    for i in l1:
+        output += i*l2[i]
+        
     return output
 
 if __name__ == "__main__":
