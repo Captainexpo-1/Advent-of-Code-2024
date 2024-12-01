@@ -9,7 +9,7 @@ def problem1(input: str) -> int|str:
     output: int = 0
     lines = utils.read_lines(input)
     
-    return output
+    return lines
 
 def problem2(input: str) -> int|str:
     output: int = 0
@@ -18,6 +18,6 @@ def problem2(input: str) -> int|str:
     return output
 
 if __name__ == "__main__":
-    input_path = utils.get_input_file(os.path.dirname(__file__), 1)
+    input_path = utils.get_input_file(os.path.dirname(__file__)+"/data", 1)
     print(problem1(input_path))
     print(problem2(input_path))
