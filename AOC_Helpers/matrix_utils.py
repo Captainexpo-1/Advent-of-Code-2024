@@ -61,8 +61,9 @@ def print_grid(grid):
         print(''.join(str(cell) for cell in row))
 
 
-def flood_fill(original_grid: list, wall_val="#", empty_val=".", use_inside: bool = False, inside_pos: tuple = (0, 0),
-               fill_val="*"):
+from copy import deepcopy
+
+def flood_fill(original_grid: list, wall_val="#", empty_val=".", use_inside: bool = False, inside_pos: tuple = (0, 0),fill_val="*"):
     """
     Perform a flood fill operation on a 2D grid.
 
@@ -77,7 +78,7 @@ def flood_fill(original_grid: list, wall_val="#", empty_val=".", use_inside: boo
     Returns:
         list: The grid with the flood fill operation applied.
     """
-    grid = original_grid.copy()
+    grid = deepcopy(original_grid)
     if type(grid[0]) == str: grid = [list(i) for i in grid]
     changes = 1
     if use_inside:
