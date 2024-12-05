@@ -77,7 +77,7 @@ def problem2(input: str) -> int | str:
                     update.insert(idx + 1, n)
                     print("After change", update)
             idx += 1
-        
+
         if not good:
             #print("BAD: ",end=" ")
             #print(update)
