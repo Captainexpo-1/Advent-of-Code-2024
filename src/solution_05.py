@@ -60,6 +60,8 @@ def problem2(input: str) -> int | str:
         r.setdefault(j[1], set())
         r[j[1]].add(j[0])
 
+    print(r)
+
     for k in updates:
         #print(update)
         update = k.copy()
@@ -72,17 +74,18 @@ def problem2(input: str) -> int | str:
                 if update[jdx] not in r.get(num, set()):
                     # Bad number
                     good = False
-                    print("Before change", idx, jdx, update, num, update[jdx], r.get(num, set()))
+                    #print("Before change", idx, jdx, update, num, update[jdx], r.get(num, set()))
                     n = update.pop(jdx)
                     update.insert(idx + 1, n)
-                    print("After change", update)
+                    #print("After change", update)
+                    break
             idx += 1
 
         if not good:
             #print("BAD: ",end=" ")
             #print(update)
             output += update[len(update)//2]
-        #print(update)
+        print(update, output)
     return output
 
 if __name__ == "__main__":
