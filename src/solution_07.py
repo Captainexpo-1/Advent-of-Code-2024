@@ -55,10 +55,9 @@ def problem2(input: str) -> int | str:
     lines = utils.read_lines(input)
 
     def naive_solve(nums: list[int], target: int):
-        positions = [None for _ in range(len(nums))]
         ops = ["+", "*", "||"]
         
-        def e():
+        def e(positions):
             # combine operators like 1 + 2 + 3 + 4
             total = nums[0]
             i = 1
@@ -76,10 +75,9 @@ def problem2(input: str) -> int | str:
         combos = list(itertools.product(ops, repeat=len(nums)-1))
         #print(combos)
         for combo in combos:
-            for i in range(len(combo)):
-                positions[i] = combo[i]
-            if e() == target:
+            if e(combo) == target:
                 return True
+
         return False
 
     for idx, line in enumerate(lines):
@@ -88,6 +86,7 @@ def problem2(input: str) -> int | str:
         others = [int(i) for i in s[1].split(" ")[1:]]
         if naive_solve(others, num):
             output += num
+        #print(f"{idx}/{len(lines)}")
         #print(f"Line {idx+1} of {len(lines)}: {output}",end="\r")
     return output
 
