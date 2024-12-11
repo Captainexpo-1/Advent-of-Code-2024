@@ -54,8 +54,6 @@ def get_neighbors_with_wrap_around(x, y, grid):
 
     return neighbors
 
-
-
 def print_grid(grid):
     for row in grid:
         print(''.join(str(cell) for cell in row))
