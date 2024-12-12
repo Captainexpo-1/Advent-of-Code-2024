@@ -31,13 +31,15 @@ def remove_duplicates_across_keys(d):
     return d
 
 # 2. Grid and Matrix Utilities
-def get_neighbors(x, y, grid):
+def get_neighbors(x, y, grid, include_none=False):
     directions = [(0, 1), (1, 0), (-1, 0), (0, -1)]  # 4-directional
     neighbors = []
     for dx, dy in directions:
         nx, ny = x + dx, y + dy
         if 0 <= nx < len(grid) and 0 <= ny < len(grid[0]):
             neighbors.append((nx, ny))
+        elif include_none:
+            neighbors.append((None, None))
     return neighbors
 
 
@@ -61,38 +63,41 @@ def print_grid(grid):
 
 from copy import deepcopy
 
-def flood_fill(original_grid: list, wall_val="#", empty_val=".", use_inside: bool = False, inside_pos: tuple = (0, 0),fill_val="*"):
+def flood_fill(original_grid: list, empty_val=".", use_inside: bool = False, inside_pos: tuple = (0, 0), fill_val="*"):
     """
     Perform a flood fill operation on a 2D grid.
 
     Args:
         original_grid (list): The original 2D grid represented as a list of lists.
-        wall_val (str): The value representing walls in the grid.
         empty_val (str): The value representing empty spaces in the grid.
         use_inside (bool): If True, starts the flood fill from inside_pos.
-        inside_pos (tuple): The starting position for flood fill if use_inside is True.
+        inside_pos (tuple): If true, the start position is counted as filled.
         fill_val (str): The value to fill the empty spaces with.
 
     Returns:
         list: The grid with the flood fill operation applied.
     """
     grid = deepcopy(original_grid)
-    if type(grid[0]) == str: grid = [list(i) for i in grid]
+    filled_positions = set()
+    if type(grid[0]) == str:
+        grid = [list(i) for i in grid]
     changes = 1
     if use_inside:
         grid[inside_pos[0]][inside_pos[1]] = fill_val
+        filled_positions.add(inside_pos)
     while changes != 0:
         changes = 0
-        for idx, i in enumerate(grid):
-            for jdx, j in enumerate(i):
-                if j == empty_val:
-                    if not use_inside and (idx == 0 or idx == len(grid) - 1 or jdx == 0 or jdx == len(grid[0]) - 1):
-                        grid[idx][jdx] = fill_val
-                        changes += 1
-                    if j == empty_val and check_neighbors((idx, jdx), grid):
-                        grid[idx][jdx] = fill_val
-                        changes += 1
-    return grid
+        for idx, row in enumerate(grid):
+            for jdx, cell in enumerate(row):
+                if cell == empty_val:
+                    neighbors = get_neighbors(idx, jdx, grid)
+                    for n in neighbors:
+                        if grid[n[0]][n[1]] == fill_val:
+                            grid[idx][jdx] = fill_val
+                            filled_positions.add((idx, jdx))
+                            changes += 1
+                            break
+    return (grid, filled_positions)
 
 
 def check_neighbors(pos, grid, to_check="*"):

@@ -68,5 +68,5 @@ def problem2(input: str) -> int | str:
 if __name__ == "__main__":
     sys.setrecursionlimit(999999999)
     input_path = utils.get_input_file(Path(__file__).resolve().parent / "data", 11)
-    #print(problem1(input_path))
+    print(problem1(input_path))
     print(problem2(input_path))
