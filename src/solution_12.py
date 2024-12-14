@@ -57,27 +57,6 @@ def problem1(input: str) -> int | str:
     return output
 
 def problem2(input: str) -> int | str:
-    """
-    The problem is that it only counts distances against the ones with the same depth, not all of them
-    That means that the sides are not counted correctly, e.g. 
-    
-    4 [[8, 9, 7, 7, 8]]
-    4 [[6, 5, 6], [9]]
-    2 [[1, 0, 0, 0, 0]]
-    3 [[0, 0, 2], [2]] <- 2 sides b/c of 2 different consecutive depths, could be fixed with some tuple magic
-    F 10 * 13 = 130
-    RRRRIICC**
-    RRRRIICCC*
-    VVRRRCC***
-    VVRCCCJ***
-    VVVVCJJC*E
-    VVIVCCJJEE
-    VVIIICJJEE
-    MIIIIIJJEE
-    MIIISIJEEE
-    MMMISSJEEE
-    
-    """
     output: int = 0
     f = utils.read_file(input)
     grid = utils.parse_grid(f)
@@ -87,71 +66,64 @@ def problem2(input: str) -> int | str:
     all_filled = set()
     while i < len(grid):
         j = 0
+
         while j < len(grid[i]):
             if (i, j) in all_filled:
                 j += 1
                 continue
             cur_val = grid[i][j]
-            #print(cur_val)
             filled, filled_positions = utils.flood_fill(grid, empty_val=cur_val, use_inside=True, inside_pos=(i,j), fill_val="*")
-            #for row in filled:
-                #print("".join(row))
-            # side data struct = list of dicts {init_pos: (x, y), direction: (dx, dy)} where dir is the direction pointing out of the shape
             
-            # top to down, left to right traversal to find top borders
-            def cast_ray_get_dist(y):
-                x = 0
-                hits = []
-                while x < len(filled[0]):
-                    if filled[y][x] == "*":
-                        if x == 0 or filled[y][x-1] != "*":
-                            hits.append(x)
-                    x += 1
-                return hits
+            filled = [["%" for _ in range(len(filled[0]))]] + filled + [["%" for _ in range(len(filled[0]))]]
+            for idx in range(len(filled)):
+                filled[idx] = ["%"] + filled[idx] + ["%"]
+                
+            # get number of contiguous sides of the shape
+            
+            data = deepcopy(filled)
+            
+            for y in range(len(filled)):
+                for x in range(len(filled[y])):
+                    data[y][x] = []
+                    if filled[y][x] != "*":
+                        for x1,y1 in utils.get_neighbors(x, y, data):
+                            if filled[y1][x1] == "*":
+                                data[y][x].append((x-x1, y-y1))
+                                #filled[y][x] = "#"
+                        
+            #utils.print_grid(filled)
+            #print()
+            def remove_all(x, y, to_remove: tuple[int, int]):
+                nonlocal data
+                #print(x, y, to_remove, data[y][x], to_remove in data[y][x])
+                if to_remove not in data[y][x]:
+                    return
+                data[y][x].remove(to_remove)
+                for x1, y1 in utils.get_neighbors(x, y, data):
+                    remove_all(x1, y1, to_remove)
+                
             
             sides = 0
-            for _ in range(4):
-                distances_per_penetration = [] # list of lists of distances for each pendepth idx = # pens, val = distance
-                for y in range(len(filled)):
-                    d = cast_ray_get_dist(y) # r
-                    if len(d) == 0:
-                        continue
-                    for i in range(len(d)):
-                        if len(distances_per_penetration) <= i:
-                            distances_per_penetration.append([])
-                        distances_per_penetration[i].append(d[i])
-                #print(distances_per_penetration)
-                
-                def get_sides(distances):
-                    if len(distances) == 0:
-                        return 0
-                    else:
-                        s = 1
-                    for i in range(1, len(distances)):
-                        if distances[i] != distances[i-1]: 
-                            s += 1
-                    return s
-                t=0
-                for pens in distances_per_penetration:
-                    m =get_sides(pens)
-                    #print(pens,"D PER P", m)
-                    t += m
-                print(t, distances_per_penetration, )
-                sides += t
-                filled = utils.rotate_90_degrees(filled)
-            #print(cur_val, sides)                
-            output += len(filled_positions) * sides
-            print(cur_val, len(filled_positions),"*",sides,"=",len(filled_positions) * sides)
-            #filled = utils.rotate_90_degrees(filled)
-            for row in filled:
-                print("".join(row))
+            y = 0
+            while y < len(data):
+                x = 0
+                while x < len(data[y]):
+                    #print(x, y, data[y][x])
+                    while data[y][x]:
+                        o = data[y][x][0]
+                        remove_all(x, y, o)
+                        sides += 1 
+                    x += 1
+                y += 1
+            output += sides * len(filled_positions)
+            print(cur_val, sides, "*", len(filled_positions))
             all_filled.update(filled_positions)
             j += 1
-            #print(i)
         i += 1
     return output
 
 if __name__ == "__main__":
+    
     input_path = utils.get_input_file(Path(__file__).resolve().parent / "data", 12)
     print(problem1(input_path))
     print(problem2(input_path))
