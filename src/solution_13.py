@@ -50,7 +50,7 @@ def problem1(input: str) -> int | str:
         # ay * px - ax * py = ay * bx * b - ax * by * b
         # ay * px - ax * py = b * (ay * bx - ax * by)
         # b = (ay * px - ax * py) / (ay * bx - ax * by)
-        # a = (px - bx * (ay * px - ax * py) / (ay * bx - ax * by)) / ax
+        # a = (px - bx * b) / ax
 
     return output
         
