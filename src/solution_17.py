@@ -10,22 +10,168 @@ import re
 import itertools
 import collections
 import math
+import functools
+import time
 import networkx
 
 
 def problem1(input: str) -> int | str:
     output: int = 0
-    lines = utils.read_lines(input)
-    # Add your solution logic here
+    f = utils.read_file(input)
+    reg, program = f.split("\n\n")
+    reg = reg.split("\n")
+    registers = {}
+    for r in reg:
+        m = r.split(": ")
+        registers[m[0][-1]] = int(m[1])
+    program = [int(i) for i in program.split(": ")[1].split(',')]
     
-    return output
+    
+    IP = 0
+    
+    def get_lit(arg: int) -> int:
+        return arg
+    def get_combo(arg: int) -> int:
+        combo = arg
+        if combo <= 3:
+            return arg
+        else:
+            match combo:
+                case 4:
+                    combo = registers["A"]
+                case 5:
+                    combo = registers["B"]
+                case 6:
+                    combo = registers["C"]   
+        return combo
+    out = []
+    while IP < len(program):
+        opcode = program[IP]
+        arg = program[IP+1]
+
+        match opcode:
+            case 0: # adv
+                registers["A"] = int(registers["A"] / (2**get_combo(arg)))
+            case 1: # bxl
+                registers ["B"] = registers["B"] ^ get_lit(arg)
+            case 2: # bst
+                registers["B"] = get_combo(arg) % 8
+            case 3: # jnz
+                if registers["A"] != 0:
+                    IP = get_lit(arg)
+                    continue
+            case 4: # bxc
+                registers["B"] = registers["B"] ^ registers["C"]
+            case 5: # out
+                out += [get_combo(arg) % 8]
+            case 6: # bdv
+                registers["B"] = registers["A"] // (2**get_combo(arg))
+            case 7: # cdv
+                registers["C"] = registers["A"] // (2**get_combo(arg))
+        #print(registers, IP, opcode, arg)
+        IP += 2
+    
+    return ','.join([str(i) for i in out])
+
+def run_program(registers: dict, program: list) -> list:
+    IP = 0
+    
+    def get_lit(arg: int) -> int:
+        return arg
+    
+    def get_combo(arg: int) -> int:
+        combo = arg
+        if combo <= 3:
+            return arg
+        else:
+            match combo:
+                case 4:
+                    combo = registers["A"]
+                case 5:
+                    combo = registers["B"]
+                case 6:
+                    combo = registers["C"]   
+        return combo
+    
+    out = []
+    while IP < len(program):
+        opcode = program[IP]
+        arg = program[IP+1]
+
+        match opcode:
+            case 0: # adv
+                registers["A"] = int(registers["A"] / (2**get_combo(arg)))
+            case 1: # bxl
+                registers["B"] = registers["B"] ^ get_lit(arg)
+            case 2: # bst
+                registers["B"] = get_combo(arg) % 8
+            case 3: # jnz
+                if registers["A"] != 0:
+                    IP = get_lit(arg)
+                    continue
+            case 4: # bxc
+                registers["B"] = registers["B"] ^ registers["C"]
+            case 5: # out
+                out += [get_combo(arg) % 8]
+            case 6: # bdv
+                registers["B"] = registers["A"] // (2**get_combo(arg))
+            case 7: # cdv
+                registers["C"] = registers["A"] // (2**get_combo(arg))
+        IP += 2
+    
+    return out
 
 def problem2(input: str) -> int | str:
-    output: int = 0
-    lines = utils.read_lines(input)
-    # Add your solution logic here
-    
-    return output
+    f = utils.read_file(input)
+    reg, program = f.split("\n\n")
+    reg = reg.split("\n")
+    registers = {}
+    for r in reg:
+        m = r.split(": ")
+        registers[m[0][-1]] = int(m[1])
+
+    program = [int(i) for i in program.split(": ")[1].split(',')]
+
+    def compare_out_to_program(out: list, program: list) -> int:
+        k = 0
+        for idx in range(len(out)-1, 0, -1):
+            if out[idx] == program[k]:
+                k += 1
+            else:
+                return k
+        return k
+
+    for A in itertools.count(202972175280680-1000, step=1): # the final search started at 202972175280680-1000
+
+        registers["A"] = A
+        out = run_program(registers, program)
+        
+        if out == program:
+            print("RESULT:",A, out, program)
+        
+        # I just kept narrowing down the search space using these fricking and statements
+        # If I found a place that fulfilled all the previous 'and' statements
+        # I would narrow the search space, lower the step size, and add another and statement
+        # This continued until I found the answer when the step size was 1
+        if out[-1] == 0 \
+        and out[-2] == 3 \
+        and out[-3] == 5 \
+        and out[-4] == 5 \
+        and out[-5] == 4 \
+        and out[-6] == 1 \
+        and out[-7] == 3 \
+        and out[-8] == 0 \
+        and out[-9] == 6 \
+        and out[-10] == 4 \
+        and out[-11] == 5 \
+        and out[-12] == 7 \
+        and out[-13] == 1 \
+        and out[-14] == 1 \
+        and out[-15] == 4 \
+        :
+            print(A, len(out), out, compare_out_to_program(out, program))    
+        
+
 
 if __name__ == "__main__":
     input_path = utils.get_input_file(Path(__file__).resolve().parent / "data", 17)

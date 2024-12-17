@@ -33,20 +33,23 @@ def dijkstra(use_graph=False, grid=None, graph=None, grid_wall_val="#"):
         return dijkstra_grid(grid, grid_wall_val)
 
 
-def dijkstra_grid(grid, wall_val):
+def dijkstra_grid(grid, wall_val, start=(0, 0), end=None):
     if not grid:
         return 0, []
 
+    if end is None:
+        end = (len(grid) - 1, len(grid[0]) - 1)
+
     rows, cols = len(grid), len(grid[0])
     distances = {(i, j): float('inf') for i in range(rows) for j in range(cols)}
-    distances[(0, 0)] = grid[0][0]
+    distances[start] = grid[start[0]][start[1]]
 
-    min_heap = [(distances[(0, 0)], (0, 0))]
+    min_heap = [(distances[start], start)]
     path = {}
 
     while min_heap:
         dist, node = heapq.heappop(min_heap)
-        if node == (rows - 1, cols - 1):
+        if node == end:
             break
 
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
@@ -58,12 +61,12 @@ def dijkstra_grid(grid, wall_val):
                     heapq.heappush(min_heap, (alt, (x, y)))
                     path[(x, y)] = node
 
-    if (rows - 1, cols - 1) not in path:
+    if end not in path:
         return -1, []
 
-    total_dist = distances[(rows - 1, cols - 1)]
+    total_dist = distances[end]
     path_points = []
-    current = (rows - 1, cols - 1)
+    current = end
 
     while current:
         path_points.append(current)
