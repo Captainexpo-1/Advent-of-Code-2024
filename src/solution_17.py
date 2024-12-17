@@ -161,9 +161,53 @@ def problem2(input: str) -> int | str:
         and out[-15] == program[-15]:
             print(A, len(out), out)    
         
+def test_automation(input: str, do_log=False) -> int | str:
+    f = utils.read_file(input)
+    reg, program = f.split("\n\n")
+    reg = reg.split("\n")
+    registers = {}
+    for r in reg:
+        m = r.split(": ")
+        registers[m[0][-1]] = int(m[1])
+
+    program = [int(i) for i in program.split(": ")[1].split(',')]
+
+    def cmp_lists(l1, l2):
+        k = 0
+        # compare backwards
+        for i in range(len(l1)):
+            if l1[-(i+1)] == l2[-(i+1)]:
+                k += 1
+            else:
+                return k
+        return k
+
+    start_search = 0
+    step_size = 100_000_000_000
+    last_best_comp = 0
+    while True:
+        if do_log: print(start_search, step_size, last_best_comp)
+        for A in itertools.count(start_search, step=step_size): # the final search started at 202972175280680-1000
+
+            registers["A"] = A
+            out = run_program(registers, program)
+            if len(out) < len(program):
+                start_search += step_size*10
+                break
+            if out == program:
+                return f"RESULT: {A} {out} {program}"
+            
+            if cmp_lists(out, program) > last_best_comp:
+                #print(A, len(out), out)    
+                last_best_comp = cmp_lists(out, program)
+                start_search = A - step_size
+                step_size = step_size // 10
+                break
+        
 
 
 if __name__ == "__main__":
     input_path = utils.get_input_file(Path(__file__).resolve().parent / "data", 17)
     print(problem1(input_path))
     print(problem2(input_path))
+    print(test_automation(input_path, do_log=True))
