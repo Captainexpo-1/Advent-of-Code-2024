@@ -187,8 +187,7 @@ def test_automation(input: str, do_log=False) -> int | str:
     last_best_comp = 0
     while True:
         if do_log: print(start_search, step_size, last_best_comp)
-        for A in itertools.count(start_search, step=step_size): # the final search started at 202972175280680-1000
-
+        for A in itertools.count(start_search, step=step_size):
             registers["A"] = A
             out = run_program(registers, program)
             if len(out) < len(program):
@@ -198,7 +197,6 @@ def test_automation(input: str, do_log=False) -> int | str:
                 return f"RESULT: {A} {out} {program}"
             
             if cmp_lists(out, program) > last_best_comp:
-                #print(A, len(out), out)    
                 last_best_comp = cmp_lists(out, program)
                 start_search = A - step_size
                 step_size = step_size // 10
