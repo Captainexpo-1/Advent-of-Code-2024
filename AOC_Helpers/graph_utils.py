@@ -37,29 +37,25 @@ def dijkstra_grid(grid, wall_val, start=(0, 0), end=None):
     if not grid:
         return 0, []
 
-    if end is None:
-        end = (len(grid) - 1, len(grid[0]) - 1)
-
     rows, cols = len(grid), len(grid[0])
-    distances = {(i, j): float('inf') for i in range(rows) for j in range(cols)}
-    distances[start] = grid[start[0]][start[1]]
+    distances = {(r, c): float('inf') for r in range(rows) for c in range(cols)}
+    distances[start] = 0
 
-    min_heap = [(distances[start], start)]
+    min_heap = [(0, start)]
     path = {}
 
     while min_heap:
         dist, node = heapq.heappop(min_heap)
-        if node == end:
-            break
+        r, c = node
 
-        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            x, y = node[0] + dx, node[1] + dy
-            if 0 <= x < rows and 0 <= y < cols and grid[x][y] != wall_val:
-                alt = dist + grid[x][y]
-                if alt < distances[(x, y)]:
-                    distances[(x, y)] = alt
-                    heapq.heappush(min_heap, (alt, (x, y)))
-                    path[(x, y)] = node
+        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            new_r, new_c = r + dr, c + dc
+            if 0 <= new_r < rows and 0 <= new_c < cols and grid[new_r][new_c] != wall_val:
+                alt = dist + 1
+                if alt < distances[(new_r, new_c)]:
+                    distances[(new_r, new_c)] = alt
+                    heapq.heappush(min_heap, (alt, (new_r, new_c)))
+                    path[(new_r, new_c)] = (r, c)
 
     if end not in path:
         return -1, []
