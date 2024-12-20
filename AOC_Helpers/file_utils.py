@@ -1,5 +1,7 @@
 import ast
 
+
+
 def get_input_file(data_path: str, day: int) -> str:
     """
     Get the path to the input file for the given problem.

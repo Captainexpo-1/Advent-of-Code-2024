@@ -7,6 +7,9 @@ from itertools import permutations, combinations
 
 # 1. File Handling
 
+def lines(s: str):
+    return [i.strip() for i in s.strip().split('\n')]
+
 def read_lines(file_path):
     """
     Read lines from a text file and return them as a list of strings.

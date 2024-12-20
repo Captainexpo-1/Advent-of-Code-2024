@@ -33,7 +33,7 @@ def dijkstra(use_graph=False, grid=None, graph=None, grid_wall_val="#"):
         return dijkstra_grid(grid, grid_wall_val)
 
 
-def dijkstra_grid(grid, wall_val, start=(0, 0), end=None):
+def dijkstra_grid(grid, wall_val, start=(0, 0), end=None, save_distances=False):
     if not grid:
         return 0, []
 
