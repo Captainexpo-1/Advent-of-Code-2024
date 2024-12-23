@@ -11,14 +11,29 @@ import itertools
 import collections
 import math
 import networkx
-
+import matplotlib.pyplot as plt
 
 def problem1(input: str) -> int | str:
     output: int = 0
     lines = utils.read_lines(input)
-    # Add your solution logic here
+
+
+    G = networkx.Graph()  
+
+    for line in lines:
+        line = line.split('-')
+        G.add_edge(line[0], line[1])
+        G.add_edge(line[1], line[0])
+
+        
+    c = networkx.enumerate_all_cliques(G)
     
-    return output
+    m = []
+    for k in c:
+        if len(k) > len(m): m = k
+    #print(cycles)
+            
+    return ','.join(sorted(m))
 
 def problem2(input: str) -> int | str:
     output: int = 0
