@@ -122,46 +122,22 @@ def problem2(input: str) -> int | str:
     
     desired = get_num("x")+get_num("y")    
     
-    def get_all_of_wire(wire):
-        c=[]
-        for k,v in connections.items():
-            if wire in k:
-                w = 
-                c.append([k,v]) 
-        return c
-    def get_full_adder(a, b):
-        adder = {
-            "a": a,
-            "b": b,
-            "cin": None,
-            "a ^ b": None,
-            "a & b": None,
-            "sum": None,
-            "cin & (a ^ b)": None,
-            "cout": None,
-        }
-        ab = connections.get((a,b),[])
-        ab = sorted(ab)
-        
-        adder["a ^ b"] = ab[1][1]
-        adder["a & b"] = ab[0][1]
-        k = get_all_of_wire(adder["a ^ b"])
-        adder["cin"] = k[0] if k else None
-        if adder["cin"] == None:
-            return adder
-        
-        adder["cin & (a ^ b)"] = connections[adder["cin"]]
-        return adder
+    p1 = problem1(input_path)
     
-    for k,v in connections.items():
-        if set([k[0][0], k[1][0]]) == set(["x","y"]):
-            
-            print(get_full_adder(*k))
+    # JRS swap WRK, CQK swp z34, FPH swp z15, GDS swp z21
     
-    return desired
-
+    print(bin(desired), desired)
+    print(bin(p1), p1)
+    print(bin(p1 ^ desired), p1 - desired)
+    
+    # get positions of the start of errors
+    for i in range(100):
+        if (1 << i) & (p1 ^ desired):
+            print(i, end=", ")
+    
 
 if __name__ == "__main__":
     input_path = utils.get_input_file(Path(__file__).resolve().parent / "data", 24)
-    print(problem1(input_path))
+    #print(problem1(input_path))
+    print(input_path)
     print(problem2(input_path))
